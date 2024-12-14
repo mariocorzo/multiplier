@@ -3,12 +3,15 @@ name: Publish NuGet Package to NuGet.org
 on:
   push:
     branches:
-      - main  # Publica cuando se haga un push a la rama principal
-  release:
-    types: [created]  # Publica cuando se cree un release
+      - '**'  # Ejecutar en todas las ramas para pruebas
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
 
 jobs:
-  publish:
+  validate:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,7 +23,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '9.0' # Cambia según la versión de .NET que uses
+          dotnet-version: '9.x'
 
       # 3. Restaura las dependencias
       - name: Restore dependencies
@@ -28,17 +31,33 @@ jobs:
 
       # 4. Ejecuta los tests
       - name: Run tests
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test
 
       # 5. Compila el proyecto
       - name: Build project
         run: dotnet build --configuration Release --no-restore --verbosity minimal
 
-      # 6. Empaqueta el proyecto
+  conditional-publish:
+    needs: validate  # Asegura que los tests y el build se completen primero
+    if: github.ref_name == 'main' && startsWith(github.event.before, 'refs/heads/release/')
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Clona el repositorio
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Configura .NET
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0'
+
+      # 3. Empaqueta el proyecto
       - name: Pack project
         run: dotnet pack --configuration Release --output ./nupkg --no-build
 
-      # 7. Publica el paquete a nuget.org
+      # 4. Publica el paquete a nuget.org
       - name: Publish NuGet package to NuGet.org
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}  # API Key almacenada en GitHub Secrets
