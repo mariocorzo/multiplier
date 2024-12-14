@@ -6,7 +6,7 @@
     <PackageId>McorzoMultiplyNumbers</PackageId>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>1.0.0</Version> <!-- Versión inicial -->
+    <Version>1.0.1</Version>
     <Authors>Mario Corzo</Authors>
     <Description>Una biblioteca sencilla para multiplicar dos números.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

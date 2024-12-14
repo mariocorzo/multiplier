@@ -8,6 +8,7 @@ namespace McorzoMultiplyNumbers
         {
             // Usar la función Multiply de MathHelper
             int result = MathHelper.Multiply(5, 3);
+            Console.WriteLine($"Version:1.0.1");
             Console.WriteLine($"El resultado de 5 x 3 es: {result}");
         }
     }
